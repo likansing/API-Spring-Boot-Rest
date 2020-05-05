@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 import curso.api.rest.model.Usuario;
 import curso.api.rest.repository.UsuarioRepository;
 
+/*assim apenas um local/determinado server podera acessar a API*/
+//@CrossOrigin(origins = "http://www.jdevtreinamento.com.br/")
+
+/*assim apenas 2 lugares determinado podera acessar a API*/
+//@CrossOrigin(origins = {"http://www.jdevtreinamento.com.br/","http://www.google.com.br/"})
+
+/*este crosOriging na classe faz com que todos os end points possam ser acessados ou assim @CrossOrigin(origins = "*")*/
+//@CrossOrigin
 @RestController /*Arquitetura REST*/
 @RequestMapping(value = "/usuario")
 public class IndexController {
@@ -72,6 +81,8 @@ public class IndexController {
 		return new ResponseEntity<Usuario> (usuario, HttpStatus.OK);
 	}
 	
+	/*Assim permite acesso ao end point especifico apenas para quem esta definido em origins*/
+//	@CrossOrigin(origins = "www.jdevtreinamento.com.br")
 	@GetMapping(value = "/", produces = "application/json")
 	public ResponseEntity<List<Usuario>> listAll(){
 		
@@ -80,7 +91,8 @@ public class IndexController {
 		return new ResponseEntity<List<Usuario>> (list, HttpStatus.OK);
 	}
 	
-	
+	/*Assim permite acesso ao end point especifico apenas para quem esta definido em origins*/
+//	@CrossOrigin(origins = {"www.jdevtreinamento.com.br","www.cliente10.com.br","www.cliente60.com.br"})
 	/*ResquestBody vai converter o json recebido em obj da classe usuario no exemplo abaixo*/
 	@PostMapping(value = "/", produces = "application/json")
 	public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario){
@@ -94,6 +106,9 @@ public class IndexController {
 		
 	}
 	
+	
+	/*Assim permite acesso ao end point especifico apenas para localhost*/
+//	@CrossOrigin(origins = {"localhost:8080"})
 	/*ResquestBody vai converter o json recebido em obj da classe usuario no exemplo abaixo*/
 	@PostMapping(value = "/vendausuario", produces = "application/json")
 	public ResponseEntity<Usuario> cadastrarVenda(@RequestBody Usuario usuario){
