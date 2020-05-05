@@ -1,17 +1,17 @@
 package curso.api.rest.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import curso.api.rest.model.Usuario;
@@ -85,6 +85,9 @@ public class IndexController {
 	@PostMapping(value = "/", produces = "application/json")
 	public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario){
 		
+		for(int pos = 0; pos < usuario.getTelefones().size(); pos++) {
+			usuario.getTelefones().get(pos).setUsuario(usuario);
+		}
 		Usuario usuarioSalvar = usuarioRepository.save(usuario);
 		
 		return new ResponseEntity<Usuario>(usuarioSalvar,HttpStatus.OK);
@@ -115,6 +118,38 @@ public class IndexController {
 		
 	}
 	
+	/*ResquestBody vai converter o json recebido em obj da classe usuario no exemplo abaixo*/
+	@PutMapping(value = "/", produces = "application/json")
+	public ResponseEntity<Usuario> atualizar(@RequestBody Usuario usuario){
+		
+		for(int pos = 0; pos < usuario.getTelefones().size(); pos++) {
+			usuario.getTelefones().get(pos).setUsuario(usuario);
+		}
+		
+		/*Usa o save mesmo pois com ID vindo no obj ele sabe que eh update.*/
+		/*sem receber o id no obj recebido da tela ira salar um novo registro no bd*/
+		Usuario usuarioSalvar = usuarioRepository.save(usuario);
+		
+		return new ResponseEntity<Usuario>(usuarioSalvar,HttpStatus.OK);
+		
+	}
 	
+	
+	/*URL exemplo: usuario/5 */
+	@DeleteMapping(value = "/{id}", produces = "application/text")
+	public String delete(@PathVariable(value = "id") Long id) {
+		
+		usuarioRepository.deleteById(id);
+				
+		return "ok";
+	}
+	
+	/*URL: usuario/5/venda */
+	@DeleteMapping(value = "/{id}/venda", produces = "application/text")
+	public String deleteenda(@PathVariable(value = "id") Long id) {
+		
+		usuarioRepository.deleteById(id);
+		return "ok";
+	}
 	
 }
