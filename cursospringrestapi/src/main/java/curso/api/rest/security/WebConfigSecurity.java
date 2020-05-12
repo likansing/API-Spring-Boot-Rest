@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -32,13 +33,11 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 		/*URL de logout - redireciona apos user deslogar*/
 		.anyRequest().authenticated().and().logout().logoutSuccessUrl("/index")
 		/*mapeia URL de Logout e invalida user*/
-		.logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
-		
+		.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 		/*Filtra as requisicoes de logion para autenticacao*/
-		
-		
+		.and().addFilterBefore(new  JWTLoginFilter("/login", authenticationManager()), UsernamePasswordAuthenticationFilter.class)	
 		/* Filtra demais requisicoes para verificar a presenca do TOKIEN JWT no reader HTTP */
-		
+		.addFilterBefore(new JwtAPIAutenticacaoFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 
 	@Override
