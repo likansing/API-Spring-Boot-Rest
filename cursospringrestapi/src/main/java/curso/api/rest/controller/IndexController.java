@@ -3,6 +3,7 @@ package curso.api.rest.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -84,10 +85,14 @@ public class IndexController {
 	
 	/*Assim permite acesso ao end point especifico apenas para quem esta definido em origins*/
 //	@CrossOrigin(origins = "www.jdevtreinamento.com.br")
+	@Cacheable("cacheusuarios")  //para usar a funcao de cache
 	@GetMapping(value = "/", produces = "application/json")
-	public ResponseEntity<List<Usuario>> listAll(){
+	public ResponseEntity<List<Usuario>> listAll() throws InterruptedException{
 		
 		List<Usuario> list = usuarioRepository.findAll();
+		
+		/*simulando que este processo [e pesado demorado, simulando 6 segundos para gerar*/
+		Thread.sleep(6000);
 		
 		return new ResponseEntity<List<Usuario>> (list, HttpStatus.OK);
 	}
@@ -142,6 +147,12 @@ public class IndexController {
 		
 		for(int pos = 0; pos < usuario.getTelefones().size(); pos++) {
 			usuario.getTelefones().get(pos).setUsuario(usuario);
+		}
+		
+		Usuario userTemp = usuarioRepository.findUserByLogin(usuario.getLogin());
+		if(!userTemp.getSenha().equals(usuario.getSenha())) { //senhas diferentes
+			String senhaCriptografada = new BCryptPasswordEncoder().encode(usuario.getSenha());
+			usuario.setSenha(senhaCriptografada);
 		}
 		
 		/*Usa o save mesmo pois com ID vindo no obj ele sabe que eh update.*/
