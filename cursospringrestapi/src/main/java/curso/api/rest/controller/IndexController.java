@@ -3,11 +3,10 @@ package curso.api.rest.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -85,7 +84,7 @@ public class IndexController {
 	
 	/*Assim permite acesso ao end point especifico apenas para quem esta definido em origins*/
 //	@CrossOrigin(origins = "www.jdevtreinamento.com.br")
-	@Cacheable("cacheusuarios")  //para usar a funcao de cache
+	@CachePut("cacheusuarios")  //para usar a funcao de cache
 	@GetMapping(value = "/", produces = "application/json")
 	public ResponseEntity<List<Usuario>> listAll() throws InterruptedException{
 		

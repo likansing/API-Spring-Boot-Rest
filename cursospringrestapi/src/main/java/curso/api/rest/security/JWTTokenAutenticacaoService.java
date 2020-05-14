@@ -57,7 +57,7 @@ public class JWTTokenAutenticacaoService {
 	}
 	
 	/*retorna o usuario validado com token ou caso nao seja valido retorna null*/
-	public Authentication getAuthentication (HttpServletRequest request) {
+	public Authentication getAuthentication (HttpServletRequest request, HttpServletResponse response) {
 		
 		/*pega o token enviado no cabecalho HTTP*/
 		String token = request.getHeader(HEADER_STRING);
@@ -77,6 +77,8 @@ public class JWTTokenAutenticacaoService {
 				}
 			}
 		}
+		/*Para liberar a resposta para porta diferente do projeto Angular*/
+		response.addHeader("Access-Control-Allow-Origin", "*");
 		return null; /*nao autorizado*/
 	
 	}
