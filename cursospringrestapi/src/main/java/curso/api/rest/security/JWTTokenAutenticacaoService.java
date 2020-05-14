@@ -49,6 +49,9 @@ public class JWTTokenAutenticacaoService {
 		/*adiciona no cabelho HTTP*/
 		response.addHeader(HEADER_STRING, token); /* exemplo de como fica: Authorization: Bearer 45465464646464646464646 */
 		
+		/*Para liberar a resposta para porta diferente do projeto Angular*/
+		response.addHeader("Access-Control-Allow-Origin", "*");
+		
 		/*escreve token como resposta no corpo do HTTP*/
 		response.getWriter().write("{\"Authorization\": \""+token+"\"}");
 	}
