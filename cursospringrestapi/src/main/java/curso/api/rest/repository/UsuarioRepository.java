@@ -14,6 +14,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 	@Query("select u from Usuario u where u.login = ?1")
 	Usuario findUserByLogin (String login);
 
-	@Query("select u from Usuario u where u.nome like %?1%")
-	List<Usuario> findUserByNome (String nome);
+	//convencao so Sping nem precisa colocar a query ele ja sabe que vai buscar assim:
+//	findBy - busca padrão (especificação Spring Data JPA) 
+//	Nome - atributo nome da entidade (especificação Spring Data JPA) 
+//	ContainingIgnoreCase - ignora o case (especificação Spring Data JPA) 
+//	@Query("select u from Usuario u where u.nome like %?1%")
+	List<Usuario> findByNomeContainingIgnoreCase (String nome);
 }

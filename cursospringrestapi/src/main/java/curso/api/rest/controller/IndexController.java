@@ -100,7 +100,7 @@ public class IndexController {
 	@GetMapping(value = "/usuarioPorNome/{nome}", produces = "application/json")
 	public ResponseEntity<List<Usuario>> usuarioPorNome(@PathVariable("nome") String nome) throws InterruptedException{
 
-		List<Usuario> list = usuarioRepository.findUserByNome(nome);
+		List<Usuario> list = usuarioRepository.findByNomeContainingIgnoreCase(nome);
 		return new ResponseEntity<List<Usuario>> (list, HttpStatus.OK);
 	}
 	
