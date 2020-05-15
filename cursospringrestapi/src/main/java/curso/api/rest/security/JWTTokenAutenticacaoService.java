@@ -48,14 +48,14 @@ public class JWTTokenAutenticacaoService {
 		
 		/*adiciona no cabelho HTTP*/
 		response.addHeader(HEADER_STRING, token); /* exemplo de como fica: Authorization: Bearer 45465464646464646464646 */
-		
-		/*Para liberar a resposta para porta diferente do projeto Angular*/
-		response.addHeader("Access-Control-Allow-Origin", "*");
+
+
+		liberacaoCors(response);
 		
 		/*escreve token como resposta no corpo do HTTP*/
 		response.getWriter().write("{\"Authorization\": \""+token+"\"}");
 	}
-	
+
 	/*retorna o usuario validado com token ou caso nao seja valido retorna null*/
 	public Authentication getAuthentication (HttpServletRequest request, HttpServletResponse response) {
 		
@@ -78,9 +78,29 @@ public class JWTTokenAutenticacaoService {
 			}
 		}
 		/*Para liberar a resposta para porta diferente do projeto Angular*/
-		response.addHeader("Access-Control-Allow-Origin", "*");
+		liberacaoCors(response);
+		
 		return null; /*nao autorizado*/
 	
+	}
+	
+	private void liberacaoCors(HttpServletResponse response) {
+		/*Para liberar a resposta para porta diferente do projeto Angular*/
+		if(response.getHeader("Access-Control-Allow-Origin") == null) {
+			response.addHeader("Access-Control-Allow-Origin", "*");
+		}
+		
+		if(response.getHeader("Access-Control-Allow-Headers") == null) {
+			response.addHeader("Access-Control-Allow-Headers", "*");
+		}
+		
+		if(response.getHeader("Access-Control-Request-Headers") == null) {
+			response.addHeader("Access-Control-Request-Headers", "*");
+		}
+		
+		if(response.getHeader("Access-Control-Allow-Methods") == null) {
+			response.addHeader("Access-Control-Allow-Methods", "*");
+		}
 	}
 	
 }

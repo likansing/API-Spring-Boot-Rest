@@ -91,10 +91,19 @@ public class IndexController {
 		List<Usuario> list = usuarioRepository.findAll();
 		
 		/*simulando que este processo [e pesado demorado, simulando 6 segundos para gerar*/
-		Thread.sleep(6000);
+//		Thread.sleep(6000);
 		
 		return new ResponseEntity<List<Usuario>> (list, HttpStatus.OK);
 	}
+	
+	@CachePut("cacheusuarios")  //para usar a funcao de cache
+	@GetMapping(value = "/usuarioPorNome/{nome}", produces = "application/json")
+	public ResponseEntity<List<Usuario>> usuarioPorNome(@PathVariable("nome") String nome) throws InterruptedException{
+
+		List<Usuario> list = usuarioRepository.findUserByNome(nome);
+		return new ResponseEntity<List<Usuario>> (list, HttpStatus.OK);
+	}
+	
 	
 	/*Assim permite acesso ao end point especifico apenas para quem esta definido em origins*/
 //	@CrossOrigin(origins = {"www.jdevtreinamento.com.br","www.cliente10.com.br","www.cliente60.com.br"})
