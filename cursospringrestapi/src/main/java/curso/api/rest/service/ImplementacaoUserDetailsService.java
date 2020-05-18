@@ -15,18 +15,22 @@ public class ImplementacaoUserDetailsService implements UserDetailsService {
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
-	
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		
-		/*Consultar no banco o usuario*/
+
+		/* Consultar no banco o usuario */
 		Usuario usuario = usuarioRepository.findUserByLogin(username);
-		
-		if(usuario == null) {
+
+		if (usuario == null) {
 			throw new UsernameNotFoundException("Usuário não foi encontrado");
 		}
-		
+
 		return new User(usuario.getLogin(), usuario.getSenha(), usuario.getAuthorities());
+	}
+
+	public void insereAcessoPadrao(Long id) {
+		usuarioRepository.insereAcessoRolePadrao(id);
 	}
 
 }

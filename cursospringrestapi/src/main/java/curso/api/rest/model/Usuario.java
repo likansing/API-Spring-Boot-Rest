@@ -15,8 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.UniqueConstraint;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,29 +32,42 @@ public class Usuario implements UserDetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
+
 	@Column(unique = true)
 	private String login;
-	
+
 	private String senha;
-	
+
 	private String nome;
-	
-	/*Para remocao de telefones se remover usuario e sera em cascata*/
+
+	/* Para remocao de telefones se remover usuario e sera em cascata */
 	@OneToMany(mappedBy = "usuario", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Telefone> telefones = new ArrayList<Telefone>();
 
-	/* uniqueConstraints faz - tera uma tabela com codigo do usuario e codigo do papel dele*/
-	/*Eager faz carregar os dados da tabela role qdo buscar usuario */
-	@OneToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "usuarios_role", uniqueConstraints = @UniqueConstraint (
-					columnNames = {"usuario_id","role_id"}, name = "unique_role_user"),
+	/*alterado pelo codigo abaixo nao comentado pela dica do aluno para evitar o delete da constraint no banco ao gravar novo user*/
+	
+	/*
+	 * uniqueConstraints faz - tera uma tabela com codigo do usuario e codigo do
+	 * papel dele
+	 */
+	/* Eager faz carregar os dados da tabela role qdo buscar usuario */
+//	@OneToMany(fetch = FetchType.EAGER)
+//	@JoinTable(name = "usuarios_role", uniqueConstraints = @UniqueConstraint (
+//					columnNames = {"usuario_id","role_id"}, name = "unique_role_user"),
+//					joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id", table = "usuario", unique = false,
+//					foreignKey = @ForeignKey(name = "usuario_fk", value = ConstraintMode.CONSTRAINT)),
+//					inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id", table = "role", unique = false, updatable = false,
+//					foreignKey = @ForeignKey (name = "role_fk", value = ConstraintMode.CONSTRAINT)))
+//	private List<Role> roles = new ArrayList<Role>(); /*papeis ou acesso para o usuario*/
+
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "usuarios_role", 
 					joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id", table = "usuario", unique = false,
 					foreignKey = @ForeignKey(name = "usuario_fk", value = ConstraintMode.CONSTRAINT)),
 					inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id", table = "role", unique = false, updatable = false,
-					foreignKey = @ForeignKey (name = "role_fk", value = ConstraintMode.CONSTRAINT)))
-	private List<Role> roles = new ArrayList<Role>(); /*papeis ou acesso para o usuario*/
-	
+					foreignKey = @ForeignKey(name = "role_fk", value = ConstraintMode.CONSTRAINT)))
+	private List<Role> roles = new ArrayList<Role>(); /* papeis ou acesso para o usuario */
+
 	public List<Telefone> getTelefones() {
 		return telefones;
 	}

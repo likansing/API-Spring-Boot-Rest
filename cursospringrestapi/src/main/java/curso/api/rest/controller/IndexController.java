@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import curso.api.rest.model.Usuario;
 import curso.api.rest.repository.UsuarioRepository;
+import curso.api.rest.service.ImplementacaoUserDetailsService;
 
 /*assim apenas um local/determinado server podera acessar a API*/
 //@CrossOrigin(origins = "http://www.jdevtreinamento.com.br/")
@@ -33,6 +34,9 @@ public class IndexController {
 	
 	@Autowired
 	private UsuarioRepository usuarioRepository;
+	
+	@Autowired
+	private ImplementacaoUserDetailsService implementacaoUserDetailsService;
 
 	/*Servico RESTfull*/
 	/*RequestParam tem q vir na URL ?nome=carlos*/
@@ -117,6 +121,8 @@ public class IndexController {
 		String senhaCriptografada = new BCryptPasswordEncoder().encode(usuario.getSenha());
 		usuario.setSenha(senhaCriptografada);
 		Usuario usuarioSalvar = usuarioRepository.save(usuario);
+		
+		implementacaoUserDetailsService.insereAcessoPadrao(usuarioSalvar.getId());
 		
 		return new ResponseEntity<Usuario>(usuarioSalvar,HttpStatus.OK);
 		
