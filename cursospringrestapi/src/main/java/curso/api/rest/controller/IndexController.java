@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import curso.api.rest.model.Usuario;
+import curso.api.rest.repository.TelefoneRepository;
 import curso.api.rest.repository.UsuarioRepository;
 import curso.api.rest.service.ImplementacaoUserDetailsService;
 
@@ -34,6 +38,9 @@ public class IndexController {
 	
 	@Autowired
 	private UsuarioRepository usuarioRepository;
+	
+	@Autowired
+	private TelefoneRepository telefoneRepository;
 	
 	@Autowired
 	private ImplementacaoUserDetailsService implementacaoUserDetailsService;
@@ -90,14 +97,31 @@ public class IndexController {
 //	@CrossOrigin(origins = "www.jdevtreinamento.com.br")
 	@CachePut("cacheusuarios")  //para usar a funcao de cache
 	@GetMapping(value = "/", produces = "application/json")
-	public ResponseEntity<List<Usuario>> listAll() throws InterruptedException{
+	public ResponseEntity<Page<Usuario>> usuarioList() throws InterruptedException{
 		
-		List<Usuario> list = usuarioRepository.findAll();
+		/*Paginacao*/
+		PageRequest page = PageRequest.of(0, 5, Sort.by("id").descending());
+		
+		Page<Usuario> list = usuarioRepository.findAll(page);
 		
 		/*simulando que este processo [e pesado demorado, simulando 6 segundos para gerar*/
 //		Thread.sleep(6000);
 		
-		return new ResponseEntity<List<Usuario>> (list, HttpStatus.OK);
+		return new ResponseEntity<Page<Usuario>> (list, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/page/{pagina}", produces = "application/json")
+	public ResponseEntity<Page<Usuario>> usuarioPagina(@PathVariable("pagina") int pagina) throws InterruptedException{
+		
+		/*Paginacao*/
+		PageRequest page = PageRequest.of(pagina, 5, Sort.by("id").descending());
+		
+		Page<Usuario> list = usuarioRepository.findAll(page);
+		
+		/*simulando que este processo [e pesado demorado, simulando 6 segundos para gerar*/
+//		Thread.sleep(6000);
+		
+		return new ResponseEntity<Page<Usuario>> (list, HttpStatus.OK);
 	}
 	
 	@CachePut("cacheusuarios")  //para usar a funcao de cache
@@ -125,9 +149,7 @@ public class IndexController {
 		implementacaoUserDetailsService.insereAcessoPadrao(usuarioSalvar.getId());
 		
 		return new ResponseEntity<Usuario>(usuarioSalvar,HttpStatus.OK);
-		
 	}
-	
 	
 	/*Assim permite acesso ao end point especifico apenas para localhost*/
 //	@CrossOrigin(origins = {"localhost:8080"})
@@ -189,9 +211,15 @@ public class IndexController {
 	
 	/*URL: usuario/5/venda */
 	@DeleteMapping(value = "/{id}/venda", produces = "application/text")
-	public String deleteenda(@PathVariable(value = "id") Long id) {
+	public String deletevenda(@PathVariable(value = "id") Long id) {
 		
 		usuarioRepository.deleteById(id);
+		return "ok";
+	}
+	
+	@DeleteMapping(value = "/removerTelefone/{id}", produces = "application/text")
+	public String deleteTelefone(@PathVariable("id") Long id) {
+		telefoneRepository.deleteById(id);
 		return "ok";
 	}
 	

@@ -135,6 +135,7 @@ public class Usuario implements UserDetails {
 
 	/* sao os acessos do usuario. Ex: ROLE_ADMIN */
 	@Override
+	@JsonIgnore
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return roles;
 	}
