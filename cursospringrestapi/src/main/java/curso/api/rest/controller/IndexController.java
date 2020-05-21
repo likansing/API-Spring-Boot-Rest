@@ -1,7 +1,5 @@
 package curso.api.rest.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
@@ -126,10 +124,37 @@ public class IndexController {
 	
 	@CachePut("cacheusuarios")  //para usar a funcao de cache
 	@GetMapping(value = "/usuarioPorNome/{nome}", produces = "application/json")
-	public ResponseEntity<List<Usuario>> usuarioPorNome(@PathVariable("nome") String nome) throws InterruptedException{
+	public ResponseEntity<Page<Usuario>> usuarioPorNome(@PathVariable("nome") String nome) throws InterruptedException{
 
-		List<Usuario> list = usuarioRepository.findByNomeContainingIgnoreCase(nome);
-		return new ResponseEntity<List<Usuario>> (list, HttpStatus.OK);
+		PageRequest pageRequest = null;
+		Page<Usuario> list = null;
+		
+		if(nome == null || (nome != null && nome.trim().isEmpty()) || nome.equalsIgnoreCase("undefined")) {
+			pageRequest = PageRequest.of(0, 5, Sort.by("id").descending());
+			list = usuarioRepository.findAll(pageRequest);
+		} else {
+			pageRequest = PageRequest.of(0, 5, Sort.by("id").descending());
+			list = usuarioRepository.findUserByNamePage(nome, pageRequest);
+		}
+				
+		return new ResponseEntity<Page<Usuario>> (list, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/usuarioPorNome/{nome}/page/{page}", produces = "application/json")
+	public ResponseEntity<Page<Usuario>> usuarioPorNomePage(@PathVariable("nome") String nome, @PathVariable("page") int page) throws InterruptedException{
+
+		PageRequest pageRequest = null;
+		Page<Usuario> list = null;
+		
+		if(nome == null || (nome != null && nome.trim().isEmpty()) || nome.equalsIgnoreCase("undefined")) {
+			pageRequest = PageRequest.of(page, 5, Sort.by("id").descending());
+			list = usuarioRepository.findAll(pageRequest);
+		} else {
+			pageRequest = PageRequest.of(page, 5, Sort.by("id").descending());
+			list = usuarioRepository.findUserByNamePage(nome, pageRequest);
+		}
+				
+		return new ResponseEntity<Page<Usuario>> (list, HttpStatus.OK);
 	}
 	
 	
