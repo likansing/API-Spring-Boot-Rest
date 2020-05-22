@@ -17,13 +17,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -50,8 +50,11 @@ public class Usuario implements UserDetails {
 	@OneToMany(mappedBy = "usuario", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Telefone> telefones = new ArrayList<Telefone>();
 
-	/*alterado pelo codigo abaixo nao comentado pela dica do aluno para evitar o delete da constraint no banco ao gravar novo user*/
-	
+	/*
+	 * alterado pelo codigo abaixo nao comentado pela dica do aluno para evitar o
+	 * delete da constraint no banco ao gravar novo user
+	 */
+
 	/*
 	 * uniqueConstraints faz - tera uma tabela com codigo do usuario e codigo do
 	 * papel dele
@@ -67,26 +70,33 @@ public class Usuario implements UserDetails {
 //	private List<Role> roles = new ArrayList<Role>(); /*papeis ou acesso para o usuario*/
 
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "usuarios_role", 
-					joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id", table = "usuario", unique = false,
-					foreignKey = @ForeignKey(name = "usuario_fk", value = ConstraintMode.CONSTRAINT)),
-					inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id", table = "role", unique = false, updatable = false,
-					foreignKey = @ForeignKey(name = "role_fk", value = ConstraintMode.CONSTRAINT)))
+	@JoinTable(name = "usuarios_role", joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id", table = "usuario", unique = false, foreignKey = @ForeignKey(name = "usuario_fk", value = ConstraintMode.CONSTRAINT)), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id", table = "role", unique = false, updatable = false, foreignKey = @ForeignKey(name = "role_fk", value = ConstraintMode.CONSTRAINT)))
 	private List<Role> roles = new ArrayList<Role>(); /* papeis ou acesso para o usuario */
 
 	@JsonFormat(pattern = "dd/MM/yyy")
 	@Temporal(TemporalType.DATE)
 	@DateTimeFormat(iso = ISO.DATE, pattern = "dd/MM/yyy")
 	private Date dataNascimento;
-	
+
+	@ManyToOne
+	private Profissao profissao;
+
+	public Profissao getProfissao() {
+		return profissao;
+	}
+
+	public void setProfissao(Profissao profissao) {
+		this.profissao = profissao;
+	}
+
 	public void setDataNascimento(Date dataNascimento) {
 		this.dataNascimento = dataNascimento;
 	}
-	
+
 	public Date getDataNascimento() {
 		return dataNascimento;
 	}
-	
+
 	public List<Telefone> getTelefones() {
 		return telefones;
 	}
