@@ -1,5 +1,6 @@
 package curso.api.rest.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -80,6 +81,16 @@ public class Usuario implements UserDetails {
 
 	@ManyToOne
 	private Profissao profissao;
+
+	private BigDecimal salario;
+
+	public void setSalario(BigDecimal salario) {
+		this.salario = salario;
+	}
+
+	public BigDecimal getSalario() {
+		return salario;
+	}
 
 	public Profissao getProfissao() {
 		return profissao;
