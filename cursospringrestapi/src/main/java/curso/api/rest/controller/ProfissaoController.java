@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import curso.api.rest.model.Profissao;
-import curso.api.rest.repository.ProfissaoRepository;
+import curso.api.rest.repositoy.ProfissaoRepository;
 
 @RestController
 @RequestMapping(value = "/profissao")
@@ -23,7 +23,9 @@ public class ProfissaoController {
 	public ResponseEntity<List<Profissao>> profissoes() {
 
 		List<Profissao> lista = profissaoRepository.findAll();
+
 		return new ResponseEntity<List<Profissao>>(lista, HttpStatus.OK);
+
 	}
 
 }

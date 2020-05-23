@@ -18,29 +18,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import curso.api.rest.model.Usuario;
 
-/*Estabelece o nosso gerenciador de token*/
+/*Estabelece o nosso gerenciador de Token*/
 public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
 
-	/* Configurando o gerenciador de autrenticacao */
+	/*Configurando o gerenciador de autenticacao*/
 	protected JWTLoginFilter(String url, AuthenticationManager authenticationManager) {
-		
-		/* Obriga autenticar url */
+       
+		/*Obriga a autenticar a URL*/
 		super(new AntPathRequestMatcher(url));
-
-		/* gerenciador de autenticacao */
-		setAuthenticationManager(authenticationManager);
+       
+       /*Gerenciador de autenticacao*/
+       setAuthenticationManager(authenticationManager);
+		
 	}
 
-	/*retorna usuario ao processar autenticacao*/
+	/*Retorna o usuário ao processar a autenticação*/
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException, IOException, ServletException {
 		
-		/*esta pegando o token para validar*/
-		Usuario user = new ObjectMapper().readValue(request.getInputStream(), Usuario.class);
+		/*Está pegando o token para validar*/
+		Usuario user = new ObjectMapper().
+				readValue(request.getInputStream(), Usuario.class);
 		
-		/*Retorna o usuario login, senha e acessos*/		
-		return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(user.getLogin(), user.getSenha()));
+		/*Retorna o usuario login, senha e acessos*/
+		return getAuthenticationManager().
+				authenticate(new UsernamePasswordAuthenticationToken(user.getLogin(), user.getSenha()));
 	}
 	
 	@Override
@@ -48,7 +51,7 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
 			Authentication authResult) throws IOException, ServletException {
 		
 		new JWTTokenAutenticacaoService().addAuthentication(response, authResult.getName());
-		
+	
 	}
 
 }

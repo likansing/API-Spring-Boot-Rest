@@ -17,7 +17,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @SpringBootApplication
 @EntityScan(basePackages = {"curso.api.rest.model"})
 @ComponentScan(basePackages = {"curso.*"})
-@EnableJpaRepositories(basePackages = {"curso.api.rest.repository"})
+@EnableJpaRepositories(basePackages = {"curso.api.rest.repositoy"})
 @EnableTransactionManagement
 @EnableWebMvc
 @RestController
@@ -27,40 +27,33 @@ public class CursospringrestapiApplication implements WebMvcConfigurer {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CursospringrestapiApplication.class, args);
-		
-		/*para gerar uma senha de teste para colocar no banco*/
-		System.out.println(new BCryptPasswordEncoder().encode("123"));
+		//System.out.println(new BCryptPasswordEncoder().encode("123"));
 	}
 	
-	
-	/*Mapeamento global que reflete em todo o sistema*/
+    /*Mapeamento Global que refletem em todo o sistema*/
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
+		
+		registry.addMapping("/usuario/**")
+		.allowedMethods("*")
+		.allowedOrigins("*");
+		
+		
+		registry.addMapping("/profissao/**")
+		.allowedMethods("*")
+		.allowedOrigins("*");
+		
 
-		registry.addMapping("/usuario/**").allowedMethods("*").allowedOrigins("*");
 		
-		registry.addMapping("/profissao/**").allowedMethods("*").allowedOrigins("*");
+		registry.addMapping("/recuperar/**")
+		.allowedMethods("*")
+		.allowedOrigins("*");
+	
 		
-		registry.addMapping("/recuperar/**").allowedMethods("*").allowedOrigins("*");
-		
-		/*libera acesso a todos os controles e todos os end-points*/
-//		registry.addMapping("/**");
-		
-		/*libera acesso a todos os end-points para o controller que cuida de /usuario  */
-//		registry.addMapping("/usuario");
-		
-		/*libera acesso a todos os end-points para o controller que cuida de /usuario  */
-//		registry.addMapping("/usuario/**");
-//		ou assim, por padrao se nao informado os metodos eh todos
-//		registry.addMapping("/usuario/**").allowedMethods("*");
-		
-		/*caso queria habilitar so os end-points de POST  */
-//		registry.addMapping("/usuario/**").allowedMethods("POST");
-		
-		/*Assim tb define as origens, seria habilitar requisicoes POST, DELETE para o cliente 40 e 5  */
-//		registry.addMapping("/usuario/**").allowedMethods("POST", "DELETE").allowedOrigins("www.cliente40.com.br","www.cliente5.com.br", "localhost:8080");
+	
+		/*Liberando o mapeamento de usuario para todas as origens*/
 		
 	}
-	
 
 }
+

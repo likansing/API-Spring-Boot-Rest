@@ -21,7 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class ControleExcecoes extends ResponseEntityExceptionHandler {
 
-	/* tratamento da maioria dos erros */
+	/* Tratamento da maioria dos erros */
 	@Override
 	@ExceptionHandler({ Exception.class, RuntimeException.class, Throwable.class })
 	protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
@@ -41,10 +41,11 @@ public class ControleExcecoes extends ResponseEntityExceptionHandler {
 		ObjetoError objetoError = new ObjetoError();
 		objetoError.setError(msg);
 		objetoError.setCode(status.value() + " ==> " + status.getReasonPhrase());
-		return new ResponseEntity<Object>(objetoError, headers, status);
+
+		return new ResponseEntity<>(objetoError, headers, status);
 	}
 
-	/* tratamento da maioria dos erros de banco de dados */
+	/* Tratamento da maioria dos erros a nível do banco de dados */
 	@ExceptionHandler({ DataIntegrityViolationException.class, ConstraintViolationException.class, PSQLException.class,
 			SQLException.class })
 	protected ResponseEntity<Object> handleExceptionDataIntegry(Exception ex) {
@@ -53,21 +54,17 @@ public class ControleExcecoes extends ResponseEntityExceptionHandler {
 
 		if (ex instanceof DataIntegrityViolationException) {
 			msg = ((DataIntegrityViolationException) ex).getCause().getCause().getMessage();
-		}
 
-		else if (ex instanceof ConstraintViolationException) {
+		} else if (ex instanceof ConstraintViolationException) {
 			msg = ((ConstraintViolationException) ex).getCause().getCause().getMessage();
-		}
 
-		else if (ex instanceof PSQLException) {
+		} else if (ex instanceof PSQLException) {
 			msg = ((PSQLException) ex).getCause().getCause().getMessage();
-		}
 
-		else if (ex instanceof SQLException) {
+		} else if (ex instanceof SQLException) {
 			msg = ((SQLException) ex).getCause().getCause().getMessage();
-		}
 
-		else {
+		} else {
 			msg = ex.getMessage();
 		}
 
@@ -76,7 +73,7 @@ public class ControleExcecoes extends ResponseEntityExceptionHandler {
 		objetoError.setCode(
 				HttpStatus.INTERNAL_SERVER_ERROR + " ==> " + HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
 
-		return new ResponseEntity<Object>(objetoError, HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>(objetoError, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }

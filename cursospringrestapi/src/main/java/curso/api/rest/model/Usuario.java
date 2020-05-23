@@ -17,12 +17,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 
+import org.hibernate.validator.constraints.br.CPF;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,7 +31,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-/*UserDetails eh do Spring Security para controle de usuario*/
 @Entity
 public class Usuario implements UserDetails {
 
@@ -47,65 +47,62 @@ public class Usuario implements UserDetails {
 
 	private String nome;
 
-	/* Para remocao de telefones se remover usuario e sera em cascata */
+	@CPF(message = "Cpf inválido")
+	private String cpf;
+
 	@OneToMany(mappedBy = "usuario", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Telefone> telefones = new ArrayList<Telefone>();
 
-	/*
-	 * alterado pelo codigo abaixo nao comentado pela dica do aluno para evitar o
-	 * delete da constraint no banco ao gravar novo user
-	 */
+	@OneToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "usuarios_role", uniqueConstraints = @UniqueConstraint(columnNames = { "usuario_id",
+			"role_id" }, name = "unique_role_user"), joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id", table = "usuario", unique = false, foreignKey = @ForeignKey(name = "usuario_fk", value = ConstraintMode.CONSTRAINT)),
 
-	/*
-	 * uniqueConstraints faz - tera uma tabela com codigo do usuario e codigo do
-	 * papel dele
-	 */
-	/* Eager faz carregar os dados da tabela role qdo buscar usuario */
-//	@OneToMany(fetch = FetchType.EAGER)
-//	@JoinTable(name = "usuarios_role", uniqueConstraints = @UniqueConstraint (
-//					columnNames = {"usuario_id","role_id"}, name = "unique_role_user"),
-//					joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id", table = "usuario", unique = false,
-//					foreignKey = @ForeignKey(name = "usuario_fk", value = ConstraintMode.CONSTRAINT)),
-//					inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id", table = "role", unique = false, updatable = false,
-//					foreignKey = @ForeignKey (name = "role_fk", value = ConstraintMode.CONSTRAINT)))
-//	private List<Role> roles = new ArrayList<Role>(); /*papeis ou acesso para o usuario*/
+			inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id", table = "role", unique = false, updatable = false, foreignKey = @ForeignKey(name = "role_fk", value = ConstraintMode.CONSTRAINT)))
+	private List<Role> roles = new ArrayList<Role>(); /* Os papeis ou acessos */
 
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "usuarios_role", joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id", table = "usuario", unique = false, foreignKey = @ForeignKey(name = "usuario_fk", value = ConstraintMode.CONSTRAINT)), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id", table = "role", unique = false, updatable = false, foreignKey = @ForeignKey(name = "role_fk", value = ConstraintMode.CONSTRAINT)))
-	private List<Role> roles = new ArrayList<Role>(); /* papeis ou acesso para o usuario */
-
-	@JsonFormat(pattern = "dd/MM/yyy")
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	@Temporal(TemporalType.DATE)
-	@DateTimeFormat(iso = ISO.DATE, pattern = "dd/MM/yyy")
+	@DateTimeFormat(iso = ISO.DATE, pattern = "dd/MM/yyyy")
 	private Date dataNascimento;
-
+	
 	@ManyToOne
 	private Profissao profissao;
-
+	
+	
+	
 	private BigDecimal salario;
-
+	
 	public void setSalario(BigDecimal salario) {
 		this.salario = salario;
 	}
-
+	
 	public BigDecimal getSalario() {
 		return salario;
 	}
-
+	
+	public void setProfissao(Profissao profissao) {
+		this.profissao = profissao;
+	}
+	
 	public Profissao getProfissao() {
 		return profissao;
 	}
 
-	public void setProfissao(Profissao profissao) {
-		this.profissao = profissao;
-	}
-
+	
 	public void setDataNascimento(Date dataNascimento) {
 		this.dataNascimento = dataNascimento;
 	}
 
 	public Date getDataNascimento() {
 		return dataNascimento;
+	}
+
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
+	}
+
+	public String getCpf() {
+		return cpf;
 	}
 
 	public List<Telefone> getTelefones() {
@@ -173,9 +170,10 @@ public class Usuario implements UserDetails {
 		return true;
 	}
 
-	/* sao os acessos do usuario. Ex: ROLE_ADMIN */
+	/* São os acessos do usuário ROLE_ADMIN OU ROLE_VISITANTE */
 	@Override
 	public Collection<Role> getAuthorities() {
+
 		return roles;
 	}
 
@@ -194,28 +192,25 @@ public class Usuario implements UserDetails {
 	@JsonIgnore
 	@Override
 	public boolean isAccountNonExpired() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@JsonIgnore
 	@Override
 	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@JsonIgnore
 	@Override
 	public boolean isCredentialsNonExpired() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@JsonIgnore
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
 		return true;
 	}
+
 }

@@ -12,45 +12,56 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import curso.api.rest.service.ImplementacaoUserDetailsService;
+import curso.api.rest.service.ImplementacaoUserDetailsSercice;
 
-/* Classe que mapeia URL's, enderecos, autoriza ou bloqueia acessos a url's */
+/*Mapeaia URL, enderecos, autoriza ou bloqueia acessoa a URL*/
 @Configuration
 @EnableWebSecurity
 public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
-	private ImplementacaoUserDetailsService implementacaoUserDetailsService;
+	private ImplementacaoUserDetailsSercice implementacaoUserDetailsSercice;
 	
-	/*Configura as solicitacoes de acesso por HTTP (web)*/
+	
+	/*Configura as solicitações de acesso por Http*/
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		
-		/*Ativando a protecao contra usuarios que nao estao validados por token*/
+
+		/*Ativando a proteção contra usuário que não estão validados por TOKEN*/
 		http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-		/*Ativando a permissao para acesso a pagina inicial do sistema que eh "/" ou "index"  */
+		
+		/*Ativando a permissão para acesso a página incial do sistema EX: sistema.com.br/index*/
 		.disable().authorizeRequests().antMatchers("/").permitAll()
 		.antMatchers("/index", "/recuperar/**").permitAll()
 		
 		.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-		/*URL de logout - redireciona apos user deslogar*/
+		
+		/*URL de Logout - Redireciona após o user deslogar do sistema*/
 		.anyRequest().authenticated().and().logout().logoutSuccessUrl("/index")
-		/*mapeia URL de Logout e invalida user*/
+		
+		/*Maperia URL de Logout e insvalida o usuário*/
 		.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-		/*Filtra as requisicoes de logion para autenticacao*/
-		.and().addFilterBefore(new  JWTLoginFilter("/login", authenticationManager()), UsernamePasswordAuthenticationFilter.class)	
-		/* Filtra demais requisicoes para verificar a presenca do TOKIEN JWT no reader HTTP */
-		.addFilterBefore(new JwtAPIAutenticacaoFilter(), UsernamePasswordAuthenticationFilter.class);
-	}
-
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		
-		/*Service que ira consultar o usuario no BD*/
-		auth.userDetailsService(implementacaoUserDetailsService)
-		/*padrao de codificacao de senha*/
-		.passwordEncoder(new BCryptPasswordEncoder());
+		/*Filtra requisições de login para autenticação*/
+		.and().addFilterBefore(new JWTLoginFilter("/login", authenticationManager()), 
+									UsernamePasswordAuthenticationFilter.class)
 		
+		/*Filtra demais requisições paa verificar a presenção do TOKEN JWT no HEADER HTTP*/
+		.addFilterBefore(new JwtApiAutenticacaoFilter(), UsernamePasswordAuthenticationFilter.class);
+	
 	}
 	
+	
+	
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+
+	/*Service que irá consultar o usuário no banco de dados*/	
+	auth.userDetailsService(implementacaoUserDetailsSercice)
+	
+	/*Padrão de codigição de senha*/
+	.passwordEncoder(new BCryptPasswordEncoder());
+	
+	}
+
 }
